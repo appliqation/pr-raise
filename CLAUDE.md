@@ -65,7 +65,16 @@ this family). This repo makes no assumption about *what* changed, only that the 
   `git@github.com:` forms `GitHubConfigStore.repo_url` can hold.
 - `src/config/env.ts` — this agent's own config; `required()`/`optional()` still come
   from `@appliqation/agent-core/config`, everything else is local (no engine/provider
-  imports at all, since there's no LLM in this repo).
+  imports at all, since there's no LLM in this repo). `auditSink` resolves
+  `AUDIT_MONGO_*`/`AUDIT_JSONL_PATH` via `@appliqation/agent-core/audit`'s
+  `resolveAuditSink()` — same opt-in mechanism as every sibling agent.
+- `src/cli/audit.ts` — `recordRaiseRun()`, extracted out of `cli/index.ts` so it's
+  testable without triggering that file's `program.parseAsync(process.argv)` side
+  effect (same reasoning as `appliqation-autotest`'s `cli/resolvers.ts`). The one real
+  variation from every other agent's audit wiring: no `model`/`usage`/`turns`/
+  `budgetExceeded` at all — this repo has no LLM loop to have any of that data from.
+  `exitCode` is `0` whenever `raise()` returns at all (including `committed: false` —
+  a legitimate non-error outcome, see above), `1` only if `raise()` threw.
 
 ## Explicitly out of scope for v1
 

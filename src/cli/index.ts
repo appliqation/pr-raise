@@ -10,6 +10,8 @@ import { Command } from 'commander';
 import { createMcpClient } from '@appliqation/agent-core';
 import { config } from '../config/env.js';
 import { raise } from '../orchestrator/raise.js';
+import { recordRaiseRun } from './audit.js';
+import type { RaiseResult } from '../orchestrator/raise.js';
 
 const program = new Command();
 program
@@ -48,21 +50,32 @@ program
     }) => {
       const client = createMcpClient({ origin: config.appqOrigin, apiKey: config.appqApiKey() });
       const prBody = opts.prBodyFile ? await readFile(opts.prBodyFile, 'utf-8') : opts.prBody;
+      const projectId = Number(opts.projectId);
 
-      const result = await raise({
-        client,
-        projectId: Number(opts.projectId),
-        repoPath: opts.repoPath,
-        branchName: opts.branchName,
-        prTitle: opts.prTitle,
-        prBody,
-        baseBranchOverride: opts.baseBranch,
-        commitMessage: opts.commitMessage,
-        githubToken: config.githubToken(),
-        gitAuthorName: config.gitAuthorName,
-        gitAuthorEmail: config.gitAuthorEmail,
-        commandTimeoutMs: config.commandTimeoutMs,
-      });
+      const startedAt = Date.now();
+      let result: RaiseResult | undefined;
+      try {
+        result = await raise({
+          client,
+          projectId,
+          repoPath: opts.repoPath,
+          branchName: opts.branchName,
+          prTitle: opts.prTitle,
+          prBody,
+          baseBranchOverride: opts.baseBranch,
+          commitMessage: opts.commitMessage,
+          githubToken: config.githubToken(),
+          gitAuthorName: config.gitAuthorName,
+          gitAuthorEmail: config.gitAuthorEmail,
+          commandTimeoutMs: config.commandTimeoutMs,
+        });
+      } finally {
+        // Audit write happens whether the run succeeded or threw — see
+        // @appliqation/agent-core's audit/sink.ts: safeRecord() (used
+        // inside recordRaiseRun) never lets a failed/unreachable audit sink
+        // affect this process's real outcome.
+        await recordRaiseRun({ sink: config.auditSink, startedAt, endedAt: Date.now(), projectId, repoPath: opts.repoPath, branchName: opts.branchName, result });
+      }
 
       if (opts.json) {
         console.log(JSON.stringify(result, null, 2));

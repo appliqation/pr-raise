@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { required, optional } from '@appliqation/agent-core/config';
+import { resolveAuditSink } from '@appliqation/agent-core/audit';
 
 export const config = {
   appqOrigin: optional('APPQ_ORIGIN') ?? 'https://appq.appliqation.io',
@@ -12,4 +13,12 @@ export const config = {
   gitAuthorName: optional('GIT_AUTHOR_NAME') ?? 'Appliqation PR Agent',
   gitAuthorEmail: optional('GIT_AUTHOR_EMAIL') ?? 'noreply@appliqation.io',
   commandTimeoutMs: Number(optional('COMMAND_TIMEOUT_MS') ?? 2 * 60 * 1000),
+
+  // Observability, entirely opt-in — see @appliqation/agent-core's audit/sink.ts.
+  auditSink: resolveAuditSink({
+    auditMongoUri: optional('AUDIT_MONGO_URI'),
+    auditMongoDb: optional('AUDIT_MONGO_DB'),
+    auditMongoCollection: optional('AUDIT_MONGO_COLLECTION'),
+    auditJsonlPath: optional('AUDIT_JSONL_PATH'),
+  }),
 };
