@@ -1,7 +1,7 @@
 {
   "name": "appliqation-pr-raise",
   "version": "0.1.0",
-  "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical — no LLM involved — reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
+  "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical \u2014 no LLM involved \u2014 reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
   "type": "module",
   "bin": {
     "appliqation-pr-raise": "./dist/cli/index.js"
@@ -9,8 +9,13 @@
   "engines": {
     "node": ">=20"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
     "dev": "tsx src/cli/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src --ext .ts",
