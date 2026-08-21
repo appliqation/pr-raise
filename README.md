@@ -29,15 +29,18 @@ flowchart LR
 ## Quick start
 
 ```bash
-git clone https://github.com/appliqation/appliqation-pr-raise.git
-cd appliqation-pr-raise
-npm install
-cp .env.example .env   # fill in APPQ_API_KEY (read-only, repo lookup only) and GITHUB_TOKEN
-npm run build
+npm install -g appliqation-pr-raise
+```
+
+Create a `.env` file (in whatever directory you'll run it from) with:
+
+```
+APPQ_API_KEY=your-appliqation-api-key   # read-only, repo lookup only
+GITHUB_TOKEN=your-github-token           # this agent's own, with repo write access
 ```
 
 ```bash
-npx appliqation-pr-raise raise \
+appliqation-pr-raise raise \
   --project-id <id> \
   --repo-path /path/to/your/checkout \
   --branch-name my-branch \
@@ -53,6 +56,10 @@ Copy `.env.example` to `.env`. Requires `APPQ_API_KEY` (read-only) and `GITHUB_T
 ## Development
 
 ```bash
+git clone https://github.com/appliqation/appliqation-pr-raise.git
+cd appliqation-pr-raise
+npm install
+cp .env.example .env   # fill in APPQ_API_KEY (read-only, repo lookup only) and GITHUB_TOKEN
 npm run dev -- raise --project-id <id> --repo-path <path> --branch-name <name> --pr-title <title>
 npm run typecheck
 npm test
