@@ -1,5 +1,5 @@
 {
-  "name": "appliqation-pr-raise",
+  "name": "@appliqation/pr-raise",
   "version": "0.1.1",
   "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical \u2014 no LLM involved \u2014 reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
   "type": "module",

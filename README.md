@@ -29,7 +29,7 @@ flowchart LR
 ## Quick start
 
 ```bash
-npm install -g appliqation-pr-raise
+npm install -g @appliqation/pr-raise
 ```
 
 Create a `.env` file (in whatever directory you'll run it from) with:
