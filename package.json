@@ -2,6 +2,10 @@
   "name": "@appliqation/pr-raise",
   "version": "0.1.1",
   "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical — no LLM involved — reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/appliqation/pr-raise.git" },
+  "homepage": "https://github.com/appliqation/pr-raise#readme",
+  "bugs": { "url": "https://github.com/appliqation/pr-raise/issues" },
   "type": "module",
   "bin": {
     "appliqation-pr-raise": "./dist/cli/index.js"
