@@ -1,6 +1,6 @@
 {
   "name": "@appliqation/pr-raise",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical — no LLM involved — reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
   "license": "MIT",
   "repository": {
