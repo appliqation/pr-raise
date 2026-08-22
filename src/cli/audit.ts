@@ -6,7 +6,7 @@
 // budgetExceeded (all absent on the underlying AuditRecord type, unlike
 // every other agent in this family).
 
-import { safeRecord, type AuditSink } from '@appliqation/agent-core';
+import { safeRecord, safeClose, type AuditSink } from '@appliqation/agent-core';
 import type { RaiseResult } from '../orchestrator/raise.js';
 
 export interface RecordRaiseRunArgs {
@@ -31,4 +31,5 @@ export async function recordRaiseRun(args: RecordRaiseRunArgs): Promise<void> {
     exitCode: result ? 0 : 1,
     outcome: result ? { projectId, repoPath, branchName, ...result } : { projectId, repoPath, branchName, error: true },
   });
+  await safeClose(sink);
 }
