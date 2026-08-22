@@ -24,7 +24,7 @@ interface ExecFailure extends Error {
 function execFileAsync(
   command: string,
   args: string[],
-  options: { cwd: string; timeout: number; maxBuffer: number },
+  options: { cwd: string; timeout: number; maxBuffer: number; env?: NodeJS.ProcessEnv },
 ): Promise<ExecOutcome> {
   return new Promise((resolvePromise, rejectPromise) => {
     execFile(command, args, options, (error, stdout, stderr) => {
@@ -46,8 +46,13 @@ export class GitClient {
     private readonly timeoutMs: number,
   ) {}
 
-  private async git(args: string[]): Promise<ExecOutcome> {
-    return execFileAsync('git', args, { cwd: this.repoPath, timeout: this.timeoutMs, maxBuffer: 10 * 1024 * 1024 });
+  private async git(args: string[], extraEnv?: Record<string, string>): Promise<ExecOutcome> {
+    return execFileAsync('git', args, {
+      cwd: this.repoPath,
+      timeout: this.timeoutMs,
+      maxBuffer: 10 * 1024 * 1024,
+      env: extraEnv ? { ...process.env, ...extraEnv } : undefined,
+    });
   }
 
   async statusPorcelain(): Promise<string> {
@@ -100,9 +105,23 @@ export class GitClient {
    * Pushes HEAD to branchName on remoteUrl, authenticating with token only
    * for this one push — never persisted into .git/config, so the token
    * doesn't linger in the checkout after this process exits.
+   *
+   * The token used to be embedded directly in the push URL, which becomes an
+   * argv element of the spawned `git` process — visible to anyone who can
+   * list this process's command line (`ps`, `/proc/<pid>/cmdline`) for
+   * however briefly the push runs, even though execFile never touches a
+   * shell. Instead it's passed as an HTTP Authorization header via Git's
+   * env-based config mechanism (GIT_CONFIG_COUNT/_KEY_n/_VALUE_n, supported
+   * since Git 2.31) — the remote URL argv stays a plain, tokenless string,
+   * and the credential only ever lives in this process's environment, which
+   * a plain `ps` does not expose.
    */
   async pushWithToken(remoteUrl: string, token: string, branchName: string): Promise<void> {
-    const authedUrl = remoteUrl.replace('https://', `https://x-access-token:${token}@`);
-    await this.git(['push', authedUrl, `HEAD:refs/heads/${branchName}`]);
+    const basicAuth = Buffer.from(`x-access-token:${token}`).toString('base64');
+    await this.git(['push', remoteUrl, `HEAD:refs/heads/${branchName}`], {
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: 'http.extraheader',
+      GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${basicAuth}`,
+    });
   }
 }

@@ -103,20 +103,42 @@ describe('GitClient', () => {
   });
 
   describe('pushWithToken', () => {
-    it('embeds the token in the push URL as x-access-token, never persisting it to the repo config', async () => {
+    it('never embeds the token in the push URL argv — the URL stays plain', async () => {
       mockSuccess('');
       await git.pushWithToken('https://github.com/owner/repo.git', 'ghp_secret123', 'feature-x');
-      expect(mockExecFile).toHaveBeenCalledWith(
-        'git',
-        ['push', 'https://x-access-token:ghp_secret123@github.com/owner/repo.git', 'HEAD:refs/heads/feature-x'],
-        expect.anything(),
-        expect.any(Function),
-      );
-      // Confirm no other call (e.g. `git remote set-url` / `git config`) ever touches persistent repo config.
+      const [, args] = mockExecFile.mock.calls[0];
+      expect(args).toEqual(['push', 'https://github.com/owner/repo.git', 'HEAD:refs/heads/feature-x']);
+      expect(args.join(' ')).not.toContain('ghp_secret123');
+    });
+
+    it('passes the credential as a base64 Authorization header via env-based git config, not argv', async () => {
+      mockSuccess('');
+      await git.pushWithToken('https://github.com/owner/repo.git', 'ghp_secret123', 'feature-x');
+      const [, , opts] = mockExecFile.mock.calls[0];
+      const expectedAuth = Buffer.from('x-access-token:ghp_secret123').toString('base64');
+      expect(opts.env).toMatchObject({
+        GIT_CONFIG_COUNT: '1',
+        GIT_CONFIG_KEY_0: 'http.extraheader',
+        GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${expectedAuth}`,
+      });
+    });
+
+    it('never persists the credential to the repo config — no `git config`/`git remote` call ever runs', async () => {
+      mockSuccess('');
+      await git.pushWithToken('https://github.com/owner/repo.git', 'ghp_secret123', 'feature-x');
       const persistentConfigCalls = mockExecFile.mock.calls.filter(
         (c) => c[1].includes('remote') || (c[1].includes('config') && !c[1].includes('-c')),
       );
       expect(persistentConfigCalls).toHaveLength(0);
+    });
+
+    it('still inherits the rest of the process env alongside the injected header', async () => {
+      process.env.SOME_UNRELATED_VAR = 'x';
+      mockSuccess('');
+      await git.pushWithToken('https://github.com/owner/repo.git', 'ghp_secret123', 'feature-x');
+      const [, , opts] = mockExecFile.mock.calls[0];
+      expect(opts.env.SOME_UNRELATED_VAR).toBe('x');
+      delete process.env.SOME_UNRELATED_VAR;
     });
   });
 
