@@ -2,7 +2,7 @@
 
 **Commits whatever's already changed in a local checkout, pushes, and opens (or reuses) a pull request.**
 
-Fully mechanical — no LLM anywhere in this repo. Deciding *what* to change is someone else's job (a human, or a sibling agent like [`appliqation-scriptgen`](https://github.com/appliqation/appliqation-scriptgen) or [`appliqation-defect-fix`](https://github.com/appliqation/appliqation-defect-fix)); this repo's only job is turning an already-made change into a real, reviewable pull request, reliably and idempotently.
+Fully mechanical — no LLM anywhere in this repo. Deciding *what* to change is someone else's job (a human, or a sibling agent like [`appliqation-scriptgen`](https://github.com/appliqation/scriptgen) or [`appliqation-defect-fix`](https://github.com/appliqation/defect-fix)); this repo's only job is turning an already-made change into a real, reviewable pull request, reliably and idempotently.
 
 ## Why a separate, dumb agent
 
@@ -56,8 +56,8 @@ Copy `.env.example` to `.env`. Requires `APPQ_API_KEY` (read-only) and `GITHUB_T
 ## Development
 
 ```bash
-git clone https://github.com/appliqation/appliqation-pr-raise.git
-cd appliqation-pr-raise
+git clone https://github.com/appliqation/pr-raise.git
+cd pr-raise
 npm install
 cp .env.example .env   # fill in APPQ_API_KEY (read-only, repo lookup only) and GITHUB_TOKEN
 npm run dev -- raise --project-id <id> --repo-path <path> --branch-name <name> --pr-title <title>
