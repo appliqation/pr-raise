@@ -1,7 +1,7 @@
 {
   "name": "@appliqation/pr-raise",
   "version": "0.1.1",
-  "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical \u2014 no LLM involved \u2014 reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
+  "description": "Standalone agent that commits local file changes in a repo checkout and opens (or reuses) a pull request. Fully mechanical — no LLM involved — reusable for scripts from appliqation-scriptgen or code changes from any future defect-fix agent.",
   "type": "module",
   "bin": {
     "appliqation-pr-raise": "./dist/cli/index.js"
@@ -29,9 +29,12 @@
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@types/node": "^22.13.10",
+    "eslint": "^9.39.5",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^3.2.7"
   }
 }
