@@ -53,6 +53,12 @@ appliqation-pr-raise raise \
 
 Copy `.env.example` to `.env`. Requires `APPQ_API_KEY` (read-only) and `GITHUB_TOKEN` (this agent's own, with repo write access).
 
+## Running this safely
+
+Unlike the rest of this family, nothing here is LLM-directed — every git/GitHub call this agent makes is a fixed operation this code decides, never something a model chooses on the fly, so there's no prompt-injection-driven "wrong destination" risk the way there is for an agent driving a browser or a shell. The real exposure is simpler: `GITHUB_TOKEN` is a genuine credential with real push access, sent over the network on every run (via an HTTP header, never in argv — see `gitClient.ts`).
+
+**Run this inside a container with an egress allowlist** anyway, consistent with the rest of the family and cheap insurance regardless: this process only ever legitimately needs to reach your configured `APPQ_ORIGIN` (`appq.appliqation.io` by default) and `github.com`/`api.github.com`. Anything else is unexpected and worth investigating.
+
 ## Development
 
 ```bash
