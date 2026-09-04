@@ -49,6 +49,29 @@ appliqation-pr-raise raise \
 
 `--project-id` resolves the target repo/branch via Appliqation's `get_project_settings` (location only — no credentials come from there). Add `--pr-body`/`--pr-body-file`, `--base-branch`, or `--commit-message` as needed; `--json` prints a structured result instead of the human summary.
 
+## CLI reference
+
+`appliqation-pr-raise raise [options]`
+
+**Required:**
+
+| Option | Description |
+|---|---|
+| `--project-id <id>` | Appliqation project ID — resolves the target GitHub repo/branch. |
+| `--repo-path <path>` | Local checkout that already has the changes to raise. |
+| `--branch-name <name>` | Branch to commit to and open the PR from. |
+| `--pr-title <title>` | Pull request title. |
+
+**Optional:**
+
+| Option | Description |
+|---|---|
+| `--pr-body <text>` | Pull request body. |
+| `--pr-body-file <path>` | Read the PR body from a file instead of `--pr-body`. |
+| `--base-branch <name>` | Override the project's configured default branch. |
+| `--commit-message <message>` | Defaults to `--pr-title`. |
+| `--json` | Print a single structured JSON result instead of a human-readable summary. |
+
 ## Configuration
 
 Copy `.env.example` to `.env`. Requires `APPQ_API_KEY` (read-only) and `GITHUB_TOKEN` (this agent's own, with repo write access).
